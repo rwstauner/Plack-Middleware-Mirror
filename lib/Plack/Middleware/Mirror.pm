@@ -66,7 +66,7 @@ sub _save_response {
             binmode($fh);
             print $fh $content
               or die "Failed to write to '$file': $!";
-            # TODO: utime the file? is that info available?
+            # TODO: utime the file with Last-Modified
           };
           warn $@ if $@;
         }
@@ -129,8 +129,9 @@ This is considered a feature.
 =head1 TODO
 
 =for :list
+* C<utime> the mirrored file using Last-Modified
 * Tests
-* use File::Spec
+* Use L<File::Spec>, etc to make it more cross-platform
 * Determine how this (should) work(s) with non-static resources (query strings)
 
 =head1 SEE ALSO
