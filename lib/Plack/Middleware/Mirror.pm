@@ -118,6 +118,12 @@ to the disk preserving the file name and directory structure.
 This creates a physical mirror of the site so that you can do other
 things with the directory structure if you desire.
 
+C<NOTE>: This middleware does not short-circuit the request
+(as L<Plack::Middleware::Cache> does), so if there is no other middleware
+to stop the request this module will let the request continue and
+save the latest version of the response each time.
+This is considered a feature.
+
 =for :stopwords TODO
 
 =head1 TODO
