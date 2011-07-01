@@ -133,4 +133,9 @@ This is considered a feature.
 * use File::Spec
 * Determine how this (should) work(s) with non-static resources (query strings)
 
+=head1 SEE ALSO
+
+=for :list
+* L<Plack::Middleware::Cache>
+
 =cut
