@@ -105,7 +105,7 @@ my ($config, $match, $dir);
   Only the simplest case has been considered.
   Suggestions, patches, and pull requests are welcome.
 
-This middleware will save the content of the response to disk
+This middleware will save the content of the response
 in a tree structure reflecting the URI path info
 to create a mirror of the site on disk.
 

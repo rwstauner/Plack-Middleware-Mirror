@@ -1,5 +1,9 @@
 =head1 Plack::Middleware::Mirror
 
+This middleware will save the content of the response
+in a tree structure reflecting the URI path info
+to create a mirror of the site on disk.
+
 See module POD for more information.
 
 =head1 COPYRIGHT AND LICENSE
