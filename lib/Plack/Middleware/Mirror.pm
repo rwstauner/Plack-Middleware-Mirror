@@ -19,6 +19,7 @@ sub call {
   $matches = [ $matches ] unless ref $matches eq 'ARRAY';
 
   # what is the best way to get this value?
+  # Plack::Request->new($env)->path;
   my $path_info = $env->{PATH_INFO};
 
   for my $match (@$matches) {
@@ -30,11 +31,15 @@ sub call {
 
 sub _save_response {
   my ($self, $env, $path_info) = @_;
+  # TODO: should we use Cwd here?
   my $dir = $self->mirror_dir || 'mirror';
 
+  # TODO: use File::Spec
   my $file = $dir . $path_info;
+  # FIXME: do we need to append to $response->[2] manually?
   my $content = '';
 
+  # TODO: use logger?
   print STDERR ref($self) . " mirror: $path_info ($file)\n"
     if $self->debug;
 
@@ -49,6 +54,7 @@ sub _save_response {
 
         # end of content
         if ( !defined $chunk ) {
+          # TODO: there must be something more appropriate than dirname()
           my $fdir = File::Basename::dirname($file);
           make_path($fdir) unless -d $fdir;
 
@@ -111,5 +117,14 @@ In contrast this middleware saves the static file requested
 to the disk preserving the file name and directory structure.
 This creates a physical mirror of the site so that you can do other
 things with the directory structure if you desire.
+
+=for :stopwords TODO
+
+=head1 TODO
+
+=for :list
+* Tests
+* use File::Spec
+* Determine how this (should) work(s) with non-static resources (query strings)
 
 =cut
