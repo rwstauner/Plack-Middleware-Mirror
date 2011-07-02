@@ -156,6 +156,23 @@ to stop the request this module will let the request continue and
 save the latest version of the response each time.
 This is considered a feature.
 
+=head1 OPTIONS
+
+=head2 path
+
+This specifies the condition used to match the request (C<PATH_INFO>).
+It can be either a regular expression
+or a callback (code ref) that can match against C<$_> or even modify it
+to alter the path of the file that will be saved to disk.
+
+It works just like
+L<< the C<path> argument to Plack::Middleware::Static|Plack::Middleware::Static/CONFIGURATIONS >>
+since the code was stolen right from there.
+
+=head2 mirror_dir
+
+This is the directory beneath which files will be saved.
+
 =for :stopwords TODO
 
 =head1 TODO
