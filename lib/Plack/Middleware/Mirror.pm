@@ -9,8 +9,8 @@ use parent 'Plack::Middleware';
 use Plack::Util;
 use Plack::Util::Accessor qw( path mirror_dir debug );
 
-use File::Path qw(make_path);;
-use File::Basename ();
+use File::Path ();
+use Path::Class 0.24 ();
 
 sub call {
   my ($self, $env) = @_;
@@ -34,8 +34,10 @@ sub _save_response {
   # TODO: should we use Cwd here?
   my $dir = $self->mirror_dir || 'mirror';
 
-  # TODO: use File::Spec
-  my $file = $dir . $path_info;
+  my $file = Path::Class::File->new($dir, split(/\//, $path));
+  my $fdir = $file->parent;
+  $file = $file->stringify;
+
   # FIXME: do we need to append to $response->[2] manually?
   my $content = '';
 
@@ -54,13 +56,12 @@ sub _save_response {
 
         # end of content
         if ( !defined $chunk ) {
-          # TODO: there must be something more appropriate than dirname()
-          my $fdir = File::Basename::dirname($file);
-          make_path($fdir) unless -d $fdir;
 
           # if writing to the file fails, don't kill the request
+          # (we'll try again next time anyway)
           local $@;
           eval {
+            File::Path::mkpath($fdir, 1, oct(777)) unless -d $fdir;
             open(my $fh, '>', $file)
               or die "Failed to open '$file': $!";
             binmode($fh);
@@ -131,7 +132,6 @@ This is considered a feature.
 =for :list
 * C<utime> the mirrored file using Last-Modified
 * Tests
-* Use L<File::Spec>, etc to make it more cross-platform
 * Determine how this (should) work(s) with non-static resources (query strings)
 
 =head1 SEE ALSO
