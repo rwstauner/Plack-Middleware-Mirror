@@ -100,6 +100,25 @@ my ($config, $match, $dir);
     # your app...
   };
 
+
+  # A specific example: Build your own mirror
+
+  # app.psgi
+  use Plack::Builder;
+
+  builder {
+    # serve the request from the disk if it exists
+    enable Static =>
+      path => $config->{match_uri},
+      root => $config->{mirror_dir},
+      pass_through => 1;
+    # if it doesn't exist yet, request it and save it
+    enable Mirror =>
+      path => $config->{match_uri},
+      mirror_dir => $config->{mirror_dir};
+    Plack::App::Proxy->new( remote => $config->{remote_uri} )->to_app
+  };
+
 =head1 DESCRIPTION
 
   NOTE: This module is in an alpha stage.
@@ -120,6 +139,17 @@ to the disk preserving the file name and directory structure.
 This creates a physical mirror of the site so that you can do other
 things with the directory structure if you desire.
 
+This is probably most useful when combined with
+L<Plack::Middleware::Static> and
+L<Plack::App::Proxy>
+to build up a mirror of another site transparently,
+downloading only the files you actually request
+instead of having to spider the whole site.
+
+However if you have a reason to copy the responses from your own web app
+onto disk you're certainly free to do so
+(a interesting form of backup perhaps).
+
 C<NOTE>: This middleware does not short-circuit the request
 (as L<Plack::Middleware::Cache> does), so if there is no other middleware
 to stop the request this module will let the request continue and
@@ -134,10 +164,13 @@ This is considered a feature.
 * C<utime> the mirrored file using Last-Modified
 * Tests
 * Determine how this (should) work(s) with non-static resources (query strings)
+* Create C<Plack::App::Mirror> to simplify creating simple site mirrors.
 
 =head1 SEE ALSO
 
 =for :list
 * L<Plack::Middleware::Cache>
+* L<Plack::Middleware::Static>
+* L<Plack::App::Proxy>
 
 =cut
