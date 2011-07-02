@@ -7,7 +7,7 @@ package Plack::Middleware::Mirror;
 
 use parent 'Plack::Middleware';
 use Plack::Util;
-use Plack::Util::Accessor qw(path mirror_dir debug);
+use Plack::Util::Accessor qw( path mirror_dir debug );
 
 use File::Path qw(make_path);;
 use File::Basename ();
@@ -15,22 +15,22 @@ use File::Basename ();
 sub call {
   my ($self, $env) = @_;
 
-  my $matches = $self->path or return;
-  $matches = [ $matches ] unless ref $matches eq 'ARRAY';
-
-  # what is the best way to get this value?
-  # Plack::Request->new($env)->path;
-  my $path_info = $env->{PATH_INFO};
-
-  for my $match (@$matches) {
-    return $self->_save_response($env, $path_info)
-      if ref($match) eq 'CODE' ? $match->($path_info) : $path_info =~ $match;
-  }
-  return $self->app->($env);
+  # if we decide not to save fall through to wrapped app
+  return $self->_save_response($env) || $self->app->($env);
 }
 
 sub _save_response {
   my ($self, $env, $path_info) = @_;
+
+  # this path matching stuff stolen straight from Plack::Middleware::Static
+  my $path_match = $self->path or return;
+  my $path = $env->{PATH_INFO};
+
+  for ($path) {
+    my $matched = 'CODE' eq ref $path_match ? $path_match->($_) : $_ =~ $path_match;
+    return unless $matched;
+  }
+
   # TODO: should we use Cwd here?
   my $dir = $self->mirror_dir || 'mirror';
 
@@ -40,7 +40,7 @@ sub _save_response {
   my $content = '';
 
   # TODO: use logger?
-  print STDERR ref($self) . " mirror: $path_info ($file)\n"
+  print STDERR ref($self) . " mirror: $path ($file)\n"
     if $self->debug;
 
   # fall back to normal request, but intercept response and save it
