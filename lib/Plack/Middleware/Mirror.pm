@@ -61,7 +61,7 @@ sub _save_response {
           # (we'll try again next time anyway)
           local $@;
           eval {
-            File::Path::mkpath($fdir, 1, oct(777)) unless -d $fdir;
+            File::Path::mkpath($fdir, 0, oct(777)) unless -d $fdir;
             open(my $fh, '>', $file)
               or die "Failed to open '$file': $!";
             binmode($fh);
