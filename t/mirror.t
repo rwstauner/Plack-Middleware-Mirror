@@ -10,6 +10,7 @@ use Plack::Middleware::Mirror ();
 
 my %requests = (
   '/helper' => "rubber\nducky",
+  '/ba/na/na' => 'tasty',
   '/monkey/island.txt' => "I want to be\na mighty pirate."
 );
 
@@ -23,7 +24,7 @@ my $app = Plack::Middleware::Mirror->wrap(
     #diag explain $env;
     return [ 200, [ 'Content-Type' => 'text/plain' ], [ $requests{ $env->{PATH_INFO} } ] ];
   },
-  path => qr/./,
+  path => sub { return 1 if /helper|monkey/; s/a/A/g; },
   mirror_dir => $dir,
   #debug => 1,
 );
@@ -39,8 +40,10 @@ test_psgi $app, sub {
     is $res->content, $content;
 
     #diag explain [`find $dir`];
+    $path = '/bA/nA/nA' if $path eq '/ba/na/na';
+
     my $file = file($dir, split(/\//, $path));
-    ok( -e $file, 'file exists' );
+    ok( -e $file, "file '$file' exists" );
 
     is slurp( $file ), $content, 'file contains "downloaded" content';
   }
