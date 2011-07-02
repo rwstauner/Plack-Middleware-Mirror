@@ -102,8 +102,9 @@ my ($config, $match, $dir);
 
 =head1 DESCRIPTION
 
-  NOTE: This is currently considered alpha quality.
-  Only the simplest case has been considered.
+  NOTE: This module is in an alpha stage.
+  Only the simplest case of static file request has been considered.
+  Handling of anything with a QUERY_STRING is currently undefined.
   Suggestions, patches, and pull requests are welcome.
 
 This middleware will save the content of the response
