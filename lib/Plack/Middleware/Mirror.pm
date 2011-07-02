@@ -20,7 +20,7 @@ sub call {
 }
 
 sub _save_response {
-  my ($self, $env, $path_info) = @_;
+  my ($self, $env) = @_;
 
   # this path matching stuff stolen straight from Plack::Middleware::Static
   my $path_match = $self->path or return;
