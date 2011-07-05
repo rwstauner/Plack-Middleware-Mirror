@@ -11,10 +11,11 @@ use Plack::Middleware::Mirror ();
 my %requests = (
   '/helper' => "rubber\nducky",
   '/ba/na/na' => 'tasty',
+  '/nothing' => 'at all',
   '/monkey/island.txt' => "I want to be\na mighty pirate."
 );
 
-plan tests => 4 * keys %requests;
+plan tests => (4 * keys %requests) - 1;
 
 my $dir = tempdir( CLEANUP => 1 );
 
@@ -43,6 +44,12 @@ test_psgi $app, sub {
     $path = '/bA/nA/nA' if $path eq '/ba/na/na';
 
     my $file = catfile($dir, split(/\//, $path));
+
+    if ( $path eq '/nothing' ) {
+      ok( !-e $file, "file '$file' does not exist: path not mirrored" );
+      next;
+    }
+
     ok( -e $file, "file '$file' exists" );
 
     is slurp( $file ), $content, 'file contains "downloaded" content';
