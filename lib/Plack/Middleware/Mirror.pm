@@ -67,7 +67,8 @@ sub _save_response {
             print $fh $content
               or die "Failed to write to '$file': $!";
             # explicitly close fh so we can set the mtime below
-            close($fh);
+            close($fh)
+              or die "Failed to close '$file': $!";
 
             # copy mtime to file if available
             if ( my $lm = Plack::Util::header_get($$res[1], 'Last-Modified') ) {
