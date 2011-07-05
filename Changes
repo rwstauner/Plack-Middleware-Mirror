@@ -2,6 +2,7 @@ Revision history for Plack-Middleware-Mirror
 
 {{$NEXT}}
 
+  - Set file mtime to reflect Last-Modified time of downloaded file
   - Do dirname() manually to remove Path::Class dependency
     (minimal usage didn't warrant it)
 

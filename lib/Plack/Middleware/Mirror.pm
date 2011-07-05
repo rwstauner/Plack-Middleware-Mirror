@@ -8,6 +8,7 @@ package Plack::Middleware::Mirror;
 use parent 'Plack::Middleware';
 use Plack::Util;
 use Plack::Util::Accessor qw( path mirror_dir debug );
+use HTTP::Date ();
 
 use File::Path ();
 use File::Spec ();
@@ -48,7 +49,7 @@ sub _save_response {
   return $self->response_cb(
     $self->app->($env),
     sub {
-      #my ($response) = @_;
+      my ($res) = @_;
       # content filter
       return sub {
         my ($chunk) = @_;
@@ -66,7 +67,19 @@ sub _save_response {
             binmode($fh);
             print $fh $content
               or die "Failed to write to '$file': $!";
-            # TODO: utime the file with Last-Modified
+            # explicitly close fh so we can set the mtime below
+            close($fh);
+
+            # copy mtime to file if available
+            if ( my $lm = Plack::Util::header_get($$res[1], 'Last-Modified') ) {
+              $lm =~ s/;.*//; # strip off any extra (copied from HTTP::Headers)
+              # may return undef which we could pass to utime, but why bother?
+              # zero (epoch) may be unlikely but is possible
+              if ( defined(my $ts = HTTP::Date::str2time($lm)) ) {
+                my $ts = HTTP::Date::str2time($lm);
+                utime( $ts, $ts, $file );
+              }
+            }
           };
           warn $@ if $@;
         }
@@ -177,7 +190,6 @@ This is the directory beneath which files will be saved.
 =head1 TODO
 
 =for :list
-* C<utime> the mirrored file using Last-Modified
 * Determine how this (should) work(s) with non-static resources (query strings)
 * Create C<Plack::App::Mirror> to simplify creating simple site mirrors.
 
