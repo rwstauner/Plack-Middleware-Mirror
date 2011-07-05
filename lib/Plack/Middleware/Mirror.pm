@@ -38,7 +38,6 @@ sub _save_response {
   my $file = File::Spec->catfile($dir, split(/\//, $path));
   my $fdir = File::Spec->catdir( (File::Spec->splitpath($file))[0, 1] ); # dirname()
 
-  # FIXME: do we need to append to $response->[2] manually?
   my $content = '';
 
   # TODO: use logger?
