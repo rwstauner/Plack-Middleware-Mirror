@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw( tempdir );
-use Path::Class 0.24;
+use File::Spec::Functions qw( catfile );
 use Plack::Test;
 use HTTP::Request::Common;
 
@@ -42,7 +42,7 @@ test_psgi $app, sub {
     #diag explain [`find $dir`];
     $path = '/bA/nA/nA' if $path eq '/ba/na/na';
 
-    my $file = file($dir, split(/\//, $path));
+    my $file = catfile($dir, split(/\//, $path));
     ok( -e $file, "file '$file' exists" );
 
     is slurp( $file ), $content, 'file contains "downloaded" content';

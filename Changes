@@ -2,6 +2,9 @@ Revision history for Plack-Middleware-Mirror
 
 {{$NEXT}}
 
+  - Do dirname() manually to remove Path::Class dependency
+    (minimal usage didn't warrant it)
+
 0.200     2011-07-02T22:26:10Z
 
   - make 'path' option consistent with Plack::Middleware::Static

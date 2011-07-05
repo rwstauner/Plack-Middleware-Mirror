@@ -10,7 +10,7 @@ use Plack::Util;
 use Plack::Util::Accessor qw( path mirror_dir debug );
 
 use File::Path ();
-use Path::Class 0.24 ();
+use File::Spec ();
 
 sub call {
   my ($self, $env) = @_;
@@ -34,9 +34,8 @@ sub _save_response {
   # TODO: should we use Cwd here?
   my $dir = $self->mirror_dir || 'mirror';
 
-  my $file = Path::Class::File->new($dir, split(/\//, $path));
-  my $fdir = $file->parent;
-  $file = $file->stringify;
+  my $file = File::Spec->catfile($dir, split(/\//, $path));
+  my $fdir = File::Spec->catdir( (File::Spec->splitpath($file))[0, 1] ); # dirname()
 
   # FIXME: do we need to append to $response->[2] manually?
   my $content = '';
