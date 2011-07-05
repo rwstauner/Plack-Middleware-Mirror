@@ -179,7 +179,6 @@ This is the directory beneath which files will be saved.
 
 =for :list
 * C<utime> the mirrored file using Last-Modified
-* Tests
 * Determine how this (should) work(s) with non-static resources (query strings)
 * Create C<Plack::App::Mirror> to simplify creating simple site mirrors.
 
