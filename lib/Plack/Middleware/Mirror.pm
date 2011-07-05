@@ -76,7 +76,6 @@ sub _save_response {
               # may return undef which we could pass to utime, but why bother?
               # zero (epoch) may be unlikely but is possible
               if ( defined(my $ts = HTTP::Date::str2time($lm)) ) {
-                my $ts = HTTP::Date::str2time($lm);
                 utime( $ts, $ts, $file );
               }
             }
