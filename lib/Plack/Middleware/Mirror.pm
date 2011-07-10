@@ -27,6 +27,12 @@ sub debug_log {
     if $self->debug;
 }
 
+sub prepare_app {
+  my ($self) = @_;
+  $self->status_codes([200])
+    unless defined $self->status_codes;
+}
+
 sub _save_response {
   my ($self, $env) = @_;
 
@@ -52,6 +58,17 @@ sub _save_response {
     $self->app->($env),
     sub {
       my ($res) = @_;
+
+      STATUS: {
+        foreach my $code ( @{ $self->status_codes } ) {
+          last STATUS if $res->[0] == $code;
+        }
+##    my $codes = $self->status_codes;
+##    if ( $codes and @$codes and not first { $res->[0] == $_ } @$codes ) {
+        $self->debug_log("ignoring unwanted status ($res->[0]): $path ($file)")
+          if $self->debug;
+        return;
+      }
 
       $self->debug_log("preparing to mirror: $path ($file)")
         if $self->debug;
@@ -191,6 +208,14 @@ since the code was stolen right from there.
 
 This is the directory beneath which files will be saved.
 
+=head2 status_codes
+
+This to an array ref of acceptable status codes to mirror.
+The default is C<[ 200 ]>
+which means that only a normal C<200 OK> response will be saved.
+
+Set this to an empty array ref (C<[]>) to mirror regardless of response code.
+
 =head2 debug
 
 Set this to true to print debugging statements to STDERR.
@@ -200,6 +225,7 @@ Set this to true to print debugging statements to STDERR.
 =head1 TODO
 
 =for :list
+* Accept callbacks for response/content to determine if it shouled be mirrored
 * Determine how this (should) work(s) with non-static resources (query strings)
 * Create C<Plack::App::Mirror> to simplify creating simple site mirrors.
 
