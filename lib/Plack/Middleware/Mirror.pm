@@ -7,7 +7,7 @@ package Plack::Middleware::Mirror;
 
 use parent 'Plack::Middleware';
 use Plack::Util;
-use Plack::Util::Accessor qw( path mirror_dir debug );
+use Plack::Util::Accessor qw( path mirror_dir debug status_codes );
 use HTTP::Date ();
 
 use File::Path ();
@@ -18,6 +18,13 @@ sub call {
 
   # if we decide not to save fall through to wrapped app
   return $self->_save_response($env) || $self->app->($env);
+}
+
+# is there any sort of logger available?
+sub debug_log {
+  my ($self, $message) = @_;
+  print STDERR ref($self) . " $message\n"
+    if $self->debug;
 }
 
 sub _save_response {
@@ -40,15 +47,15 @@ sub _save_response {
 
   my $content = '';
 
-  # TODO: use logger?
-  print STDERR ref($self) . " mirror: $path ($file)\n"
-    if $self->debug;
-
   # fall back to normal request, but intercept response and save it
   return $self->response_cb(
     $self->app->($env),
     sub {
       my ($res) = @_;
+
+      $self->debug_log("preparing to mirror: $path ($file)")
+        if $self->debug;
+
       # content filter
       return sub {
         my ($chunk) = @_;
@@ -183,6 +190,10 @@ since the code was stolen right from there.
 =head2 mirror_dir
 
 This is the directory beneath which files will be saved.
+
+=head2 debug
+
+Set this to true to print debugging statements to STDERR.
 
 =for :stopwords TODO
 
