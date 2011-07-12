@@ -2,6 +2,14 @@ Revision history for Plack-Middleware-Mirror
 
 {{$NEXT}}
 
+0.400     2011-07-12T15:15:18Z
+
+  - Only mirror if status code is 200
+    (or anything else in 'status_codes' attribute).
+
+  - Add more/clearer debug statements
+  - Improve test scripts for smoke environments
+
 0.300     2011-07-05T23:34:43Z
 
   - Set file mtime to reflect Last-Modified time of downloaded file
