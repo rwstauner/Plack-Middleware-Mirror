@@ -27,7 +27,7 @@ my $app = Plack::Middleware::Mirror->wrap(
   },
   path => sub { return 1 if /helper|monkey/; s/a/A/g; },
   mirror_dir => $dir,
-  #debug => 1,
+  debug => $ENV{AUTOMATED_TESTING},
 );
 
 test_psgi $app, sub {

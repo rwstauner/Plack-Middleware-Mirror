@@ -24,7 +24,7 @@ my $app = Plack::Middleware::Mirror->wrap(
   path => qr/./,
   mirror_dir => $dir,
   status_codes => [ 379 ], # ignoring 200 (contrived)
-  #debug => 1,
+  debug => $ENV{AUTOMATED_TESTING},
 );
 
 test_psgi $app, sub {
