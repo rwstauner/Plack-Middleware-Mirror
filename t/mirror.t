@@ -50,9 +50,12 @@ test_psgi $app, sub {
       next;
     }
 
-    ok( -e $file, "file '$file' exists" );
+SKIP: {
+    ok( -e $file, "file '$file' exists" )
+      or skip q[don't try to read file that doesn't exist], 1;
 
     is slurp( $file ), $content, 'file contains "downloaded" content';
+}
   }
 };
 

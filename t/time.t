@@ -50,8 +50,10 @@ test_psgi $app, sub {
     is $res->code, 200;
     is $res->content, 'time';
 
+SKIP: {
     my $file = catfile($dir, split(/\//, $path));
-    ok( -e $file, "file '$file' exists" );
+    ok( -e $file, "file '$file' exists" )
+      or skip q[can't stat() file that doesn't exist], 1;
 
     my $now = time;
     my $mtime = (stat $file)[9];
@@ -64,5 +66,6 @@ test_psgi $app, sub {
       # use range to allow for the clock to increment to the next second
       ok( $mtime >= $exp && $mtime <= $now, "mtime is now() for $desc" );
     }
+}
   }
 };
