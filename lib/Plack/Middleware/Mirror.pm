@@ -53,14 +53,15 @@ sub _save_response {
 
   my $content = '';
 
+  $self->debug_log("preparing to mirror: $path")
+    if $self->debug;
+
   # fall back to normal request, but intercept response and save it
   return $self->response_cb(
     $self->app->($env),
     sub {
       my ($res) = @_;
 
-      $self->debug_log("preparing to mirror: $path ($file)")
-        if $self->debug;
       return unless $self->should_mirror_status($res->[0]);
 
       # content filter
@@ -70,11 +71,15 @@ sub _save_response {
         # end of content
         if ( !defined $chunk ) {
 
+          $self->debug_log("attempting to save: $path => $file")
+            if $self->debug;
+
           # if writing to the file fails, don't kill the request
           # (we'll try again next time anyway)
           local $@;
           eval {
             File::Path::mkpath($fdir, 0, oct(777)) unless -d $fdir;
+
             open(my $fh, '>', $file)
               or die "Failed to open '$file': $!";
             binmode($fh);
