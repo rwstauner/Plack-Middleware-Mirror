@@ -14,11 +14,9 @@ my %requests = (
   '/saved'    => [ 379, [ 'Content-type' => 'text/plain' ], [ 'what is this status?' ] ],
 );
 
-plan tests => (3 * keys %requests);
+plan tests => (3 * keys %requests) + 11;
 
 my $dir = tempdir( CLEANUP => 1 );
-
-# TODO: test empty arrayref
 
 my $response;
 my $app = Plack::Middleware::Mirror->wrap(
@@ -50,3 +48,22 @@ test_psgi $app, sub {
     }
   }
 };
+
+$app = Plack::Middleware::Mirror->new();
+ok( $app->should_mirror_status( 200 ), 'mirror ok by default' );
+ok(!$app->should_mirror_status( 302 ), 'do not 302 by default' );
+
+$app = Plack::Middleware::Mirror->new( status_codes => [ 379 ] );
+ok( $app->should_mirror_status( 379 ), 'mirror specified status' );
+ok(!$app->should_mirror_status( 479 ), 'do not mirror unaccepted status' );
+ok(!$app->should_mirror_status( 200 ), 'not even 200' );
+
+$app = Plack::Middleware::Mirror->new( status_codes => [ 200, 379 ] );
+ok( $app->should_mirror_status( 379 ), 'mirror specified status' );
+ok( $app->should_mirror_status( 200 ), 'including 200' );
+ok(!$app->should_mirror_status( 479 ), 'do not mirror unaccepted status' );
+
+$app = Plack::Middleware::Mirror->new( status_codes => [] );
+ok( $app->should_mirror_status( 200 ), 'mirror everything' );
+ok( $app->should_mirror_status( 302 ), 'mirror everything' );
+ok( $app->should_mirror_status( 579 ), 'mirror everything' );
