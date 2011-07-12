@@ -112,7 +112,7 @@ sub _save_response {
 }
 
 sub should_mirror_status {
-  my ( $self, $res_code, $path ) = @_;
+  my ( $self, $res_code ) = @_;
   my $codes = $self->status_codes || [ 200 ];
 
   # if codes is an empty arrayref don't restrict by code, just allow all
@@ -130,6 +130,8 @@ sub should_mirror_status {
 }
 
 1;
+
+=for Pod::Coverage debug_log should_mirror_status
 
 =for test_synopsis
 my ($config, $match, $dir);
@@ -238,7 +240,7 @@ Set this to true to print debugging statements to STDERR.
 =head1 TODO
 
 =for :list
-* Accept callbacks for response/content to determine if it shouled be mirrored
+* Accept callbacks for response/content to determine if it should be mirrored
 * Determine how this (should) work(s) with non-static resources (query strings)
 * Create C<Plack::App::Mirror> to simplify creating simple site mirrors.
 
