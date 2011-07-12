@@ -59,19 +59,9 @@ sub _save_response {
     sub {
       my ($res) = @_;
 
-      STATUS: {
-        foreach my $code ( @{ $self->status_codes } ) {
-          last STATUS if $res->[0] == $code;
-        }
-##    my $codes = $self->status_codes;
-##    if ( $codes and @$codes and not first { $res->[0] == $_ } @$codes ) {
-        $self->debug_log("ignoring unwanted status ($res->[0]): $path ($file)")
-          if $self->debug;
-        return;
-      }
-
       $self->debug_log("preparing to mirror: $path ($file)")
         if $self->debug;
+      return unless $self->should_mirror_status($res->[0]);
 
       # content filter
       return sub {
@@ -114,6 +104,24 @@ sub _save_response {
       }
     }
   );
+}
+
+sub should_mirror_status {
+  my ( $self, $res_code, $path ) = @_;
+  my $codes = $self->status_codes || [ 200 ];
+
+  # if codes is an empty arrayref don't restrict by code, just allow all
+  return 1 if ! @$codes;
+
+  # if status code is one of the accepted codes, return true
+  foreach my $code ( @$codes ) {
+    return 1 if $res_code == $code;
+  }
+
+  # if none of the above is true don't mirror
+  $self->debug_log("ignoring unwanted status ($res_code)")
+    if $self->debug;
+  return 0;
 }
 
 1;
