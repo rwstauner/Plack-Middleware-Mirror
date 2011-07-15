@@ -2,6 +2,10 @@ Revision history for Plack-Middleware-Mirror
 
 {{$NEXT}}
 
+0.401     2011-07-15T00:03:28Z
+
+  - Update metadata
+
 0.400     2011-07-12T15:15:18Z
 
   - Only mirror if status code is 200
